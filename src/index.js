@@ -70,44 +70,35 @@ app.put('/todos/:id', checksExistsUserAccount, (request, response) => {
   const { id } = request.params
   const { title, deadline } = request.body
 
-  const todo = user.todos.find(item => item.id === id)
-  if (!todo) {
+  const index = user.todos.findIndex(item => item.id === id)
+  if (!!index) {
     return response.status(404).json({ error: "Todo not found." })
   }
 
-  let updatedTodo = {}
-  const newTodos = user.todos.map(item => {
-    if (item.id === id) {
-      updatedTodo = { ...item, title, deadline }
-      return updatedTodo
-    }
-    return item
-  })
+  user.todos[index] = {
+    ...user.todos[index],
+    title,
+    deadline
+  }
 
-  user.todos = newTodos;
-
-  return response.json(updatedTodo)
+  return response.json(user.todos[index])
 });
 
 app.patch('/todos/:id/done', checksExistsUserAccount, (request, response) => {
   const { user } = request
   const { id } = request.params
 
-  const todo = user.todos.find(item => item.id === id)
-  if (!todo) {
+  const index = user.todos.findIndex(item => item.id === id)
+  if (!!index) {
     return response.status(404).json({ error: "Todo not found." })
   }
 
-  let updatedTodo = {}
-  const newTodos = user.todos.map(item => {
-    if (item.id === id) {
-      updatedTodo = { ...item, done: true }
-      return updatedTodo
-    }
-    return item
-  })
+  user.todos[index] = {
+    ...user.todos[index],
+    done: true
+  }
 
-  return response.json(updatedTodo)
+  return response.json(user.todos[index])
 });
 
 app.delete('/todos/:id', checksExistsUserAccount, (request, response) => {
@@ -119,9 +110,7 @@ app.delete('/todos/:id', checksExistsUserAccount, (request, response) => {
     return response.status(404).json({ error: "Todo not found." })
   }
 
-  const newTodos = user.todos.filter(item => item.id !== id)
-
-  user.todos = newTodos;
+  user.todos.splice(todo, 1);
 
   return response.status(204).json({ message: "Todo has been deleted." })
 });
